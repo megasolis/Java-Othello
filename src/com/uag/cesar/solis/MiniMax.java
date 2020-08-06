@@ -2,7 +2,6 @@ package com.uag.cesar.solis;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class MiniMax {
   private static final int PLY_DEPTH = 4;
@@ -10,15 +9,59 @@ public class MiniMax {
   private static final float MAX_POSSIBLE_VALUE = 10.0F;
 
   private static float evaluateMax(int[][] boardState) {
-    // TODO: put real "IA" here
-    final Random r = new Random();
-    return MIN_POSSIBLE_VALUE + r.nextFloat() * (MAX_POSSIBLE_VALUE - MIN_POSSIBLE_VALUE);
+    final int[][] weights = new int[][] {
+        {0,   0,   0,   0,   0,   0,   0,   0,   0,   0},
+        {0, 120, -20,  20,   5,   5,  20, -20, 120,   0},
+        {0, -20, -40,  -5,  -5,  -5,  -5, -40, -20,   0},
+        {0,  20,  -5,  15,   3,   3,  15,  -5,  20,   0},
+        {0,   5,  -5,   3,   3,   3,   3,  -5,   5,   0},
+        {0,   5,  -5,   3,   3,   3,   3,  -5,   5,   0},
+        {0,  20,  -5,  15,   3,   3,  15,  -5,  20,   0},
+        {0, -20, -40,  -5,  -5,  -5,  -5, -40, -20,   0},
+        {0, 120, -20,  20,   5,   5,  20, -20, 120,   0},
+        {0,   0,   0,   0,   0,   0,   0,   0,   0,   0}
+    };
+
+    int result = 0;
+    for(int i=0; i < boardState.length; i++) {
+      for(int j=0; j < boardState[i].length; j++) {
+        if (boardState[i][j] == Disc.WHITE.getDiscIntValue()){
+          result += weights[i][j];
+        }
+        else if (boardState[i][j] != 0){
+          result -= weights[i][j];
+        }
+      }
+    }
+    return result;
   }
 
   private static float evaluateMin(int[][] boardState) {
-    // TODO: put real "IA" here
-    final Random r = new Random();
-    return MIN_POSSIBLE_VALUE + r.nextFloat() * (MAX_POSSIBLE_VALUE - MIN_POSSIBLE_VALUE);
+    final int[][] weights = new int[][] {
+        {0,   0,   0,   0,   0,   0,   0,   0,   0,   0},
+        {0, 120, -20,  20,   5,   5,  20, -20, 120,   0},
+        {0, -20, -40,  -5,  -5,  -5,  -5, -40, -20,   0},
+        {0,  20,  -5,  15,   3,   3,  15,  -5,  20,   0},
+        {0,   5,  -5,   3,   3,   3,   3,  -5,   5,   0},
+        {0,   5,  -5,   3,   3,   3,   3,  -5,   5,   0},
+        {0,  20,  -5,  15,   3,   3,  15,  -5,  20,   0},
+        {0, -20, -40,  -5,  -5,  -5,  -5, -40, -20,   0},
+        {0, 120, -20,  20,   5,   5,  20, -20, 120,   0},
+        {0,   0,   0,   0,   0,   0,   0,   0,   0,   0}
+    };
+    int result = 0;
+
+    for(int i=0; i < boardState.length; i++) {
+      for(int j=0; j < boardState[i].length; j++) {
+        if (boardState[i][j] == Disc.BLACK.getDiscIntValue()){
+          result += weights[i][j];
+        }
+        else if (boardState[i][j] != 0){
+          result -= weights[i][j];
+        }
+      }
+    }
+    return result;
   }
 
   private static int[][] cloneBoardState(int[][] boardState) {
@@ -39,7 +82,10 @@ public class MiniMax {
           = Disc.BLACK.getDiscIntValue();
       moveMax = computeMax(clonedBoardState, 0);
 
-      if (moveMax > max) {
+      if (max == Float.MIN_VALUE) {
+        max = moveMax;
+        bestMove = m;
+      } else if (moveMax > max) {
         max = moveMax;
         bestMove = m;
       }
@@ -71,7 +117,10 @@ public class MiniMax {
           Disc.BLACK.getDiscIntValue();
       moveMax = computeMin(boardState, depth);
 
-      if (moveMax > max) {
+      if (max == Float.MIN_VALUE) {
+        // first value
+        max = moveMax;
+      } else if (moveMax > max) {
         max = moveMax;
       }
     }
@@ -103,7 +152,10 @@ public class MiniMax {
           Disc.WHITE.getDiscIntValue();
       moveMin = computeMax(boardState, depth);
 
-      if (moveMin < min) {
+      if (min == Float.MAX_VALUE) {
+        // first value
+        min = moveMin;
+      } else if (moveMin < min) {
         min = moveMin;
       }
     }
